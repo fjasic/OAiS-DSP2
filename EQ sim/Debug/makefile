@@ -4,7 +4,10 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccsv6/tools/compiler/c5500_4.4.1
+CG_TOOL_ROOT := C:/ti/ccs6/ccsv6/tools/compiler/c5500_4.4.1
+
+GEN_OPTS__FLAG := 
+GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
 "./EZDSP5535_SAR_sim.obj" \
@@ -16,14 +19,14 @@ ORDERED_OBJS += \
 "./print_number.obj" \
 "./processing.obj" \
 "../lnkx.cmd" \
-"../lib/ezdsp5535bsl.lib" \
 "../c55xx_csl/lib/cslVC5505.lib" \
+"../lib/ezdsp5535bsl.lib" \
 $(GEN_CMDS__FLAG) \
--l"libc.a" \
--l"rts55h.lib" \
--l"cslVC5505.lib" \
--l"rts55x.lib" \
--l"ezdsp5535bsl.lib" \
+-llibc.a \
+-lrts55h.lib \
+-lcslVC5505.lib \
+-lrts55x.lib \
+-lezdsp5535bsl.lib \
 
 -include ../makefile.init
 
@@ -33,11 +36,11 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
--include lib/subdir_vars.mk
 -include c55xx_csl/lib/subdir_vars.mk
+-include lib/subdir_vars.mk
 -include subdir_rules.mk
--include lib/subdir_rules.mk
 -include c55xx_csl/lib/subdir_rules.mk
+-include lib/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -58,6 +61,9 @@ ifneq ($(strip $(ASM_DEPS)),)
 endif
 ifneq ($(strip $(CC_DEPS)),)
 -include $(CC_DEPS)
+endif
+ifneq ($(strip $(SV7A_DEPS)),)
+-include $(SV7A_DEPS)
 endif
 ifneq ($(strip $(S55_DEPS)),)
 -include $(S55_DEPS)
@@ -150,20 +156,20 @@ all: EQ\ sim.out
 EQ\ sim.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: C5500 Linker'
-	"C:/ti/ccsv6/tools/compiler/c5500_4.4.1/bin/cl55" -v5515 --memory_model=large -g --define=c5535 --display_error_number --diag_warning=225 --ptrdiff_size=16 -z -m"EQ sim.map" --stack_size=0x200 --heap_size=0x400 -i"C:/ti/ccsv6/tools/compiler/c5500_4.4.1/lib" -i"C:/Users/student/Desktop/ra46-2014/OAiS-DSP2/EQ sim/c55xx_csl/lib" -i"C:/Users/student/Desktop/ra46-2014/OAiS-DSP2/EQ sim/lib" -i"C:/ti/ccsv6/tools/compiler/c5500_4.4.1/include" --reread_libs --display_error_number --warn_sections --xml_link_info="EQ sim_linkInfo.xml" --rom_model --sys_stacksize=0x200 -o "EQ sim.out" $(ORDERED_OBJS)
+	"C:/ti/ccs6/ccsv6/tools/compiler/c5500_4.4.1/bin/cl55" -v5515 --memory_model=large -g --define=c5535 --display_error_number --diag_warning=225 --ptrdiff_size=16 -z -m"EQ sim.map" --stack_size=0x200 --heap_size=0x400 -i"C:/ti/ccs6/ccsv6/tools/compiler/c5500_4.4.1/lib" -i"C:/Users/NN/Desktop/OAIS DSP2/OAiS-DSP2/EQ sim/c55xx_csl/lib" -i"C:/Users/NN/Desktop/OAIS DSP2/OAiS-DSP2/EQ sim/lib" -i"C:/ti/ccs6/ccsv6/tools/compiler/c5500_4.4.1/include" --reread_libs --display_error_number --warn_sections --xml_link_info="EQ sim_linkInfo.xml" --rom_model --sys_stacksize=0x200 -o "EQ sim.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 EQ\ sim.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: C5500 Hex Utility'
-	"C:/ti/ccsv6/tools/compiler/c5500_4.4.1/bin/hex55"  -o "EQ sim.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccs6/ccsv6/tools/compiler/c5500_4.4.1/bin/hex55"  -o "EQ sim.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "EZDSP5535_SAR_sim.pp" "aic3204.pp" "aic3204_init.pp" "ezdsp5535_aic3204_dma.pp" "iir.pp" "main.pp" "print_number.pp" "processing.pp" 
+	-$(RM) "EZDSP5535_SAR_sim.d" "aic3204.d" "aic3204_init.d" "ezdsp5535_aic3204_dma.d" "iir.d" "main.d" "print_number.d" "processing.d" 
 	-$(RM) "EZDSP5535_SAR_sim.obj" "aic3204.obj" "aic3204_init.obj" "ezdsp5535_aic3204_dma.obj" "iir.obj" "main.obj" "print_number.obj" "processing.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '

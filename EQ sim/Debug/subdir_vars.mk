@@ -27,24 +27,24 @@ OBJS += \
 ./processing.obj 
 
 C_DEPS += \
-./EZDSP5535_SAR_sim.pp \
-./aic3204.pp \
-./aic3204_init.pp \
-./ezdsp5535_aic3204_dma.pp \
-./iir.pp \
-./main.pp \
-./print_number.pp \
-./processing.pp 
+./EZDSP5535_SAR_sim.d \
+./aic3204.d \
+./aic3204_init.d \
+./ezdsp5535_aic3204_dma.d \
+./iir.d \
+./main.d \
+./print_number.d \
+./processing.d 
 
 C_DEPS__QUOTED += \
-"EZDSP5535_SAR_sim.pp" \
-"aic3204.pp" \
-"aic3204_init.pp" \
-"ezdsp5535_aic3204_dma.pp" \
-"iir.pp" \
-"main.pp" \
-"print_number.pp" \
-"processing.pp" 
+"EZDSP5535_SAR_sim.d" \
+"aic3204.d" \
+"aic3204_init.d" \
+"ezdsp5535_aic3204_dma.d" \
+"iir.d" \
+"main.d" \
+"print_number.d" \
+"processing.d" 
 
 OBJS__QUOTED += \
 "EZDSP5535_SAR_sim.obj" \
