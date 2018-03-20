@@ -1,0 +1,45 @@
+/*
+ * processing.c
+ *
+ *  Created on: 29.02.2016.
+ *      Author: Dejan Bokan (dejan.bokan@rt-rk.com)
+ */
+
+#include "processing.h"
+#include "fir.h"
+#include "signal.h"
+#include "filter_coeff.h"
+void downsample(Int16 *input, Int16 *output, int M, int N)
+{
+	int i;
+	int j=0;
+
+		for(i=0; i<N ;i+M) {
+		output[j]=input[i];
+		j++;
+		}
+
+}
+void decimate(Int16 *input, Int16 *output, int M, int N)
+{
+
+	Int16 filtriran=fir_basic(input, lp_filter,input, N_COEFF)
+
+		downsample(filtriran,output,4,1024);
+}
+
+
+void upsample(Int16 *input, Int16 *output, int L, int N)
+{
+	/* your code here... */
+}
+
+void interpolate(Int16 *input, Int16 *output, int L, int N)
+{
+	/* your code here... */
+}
+
+void resample(Int16 *input, Int16 *output, int L, int M, int N)
+{
+	/* your code here... */
+}

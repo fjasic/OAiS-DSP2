@@ -1,0 +1,35 @@
+//////////////////////////////////////////////////////////////////////////////
+// * File name: main.c
+// *
+// * Description:  Vezba 1 - Interpolacija i decimacija
+// *
+// * Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/
+// * Copyright (C) 2011 Spectrum Digital, Incorporated
+// *
+//////////////////////////////////////////////////////////////////////////////
+
+#include "tistdtypes.h"
+#include <cstdio>
+#include "ezdsp5535.h"
+#include "math.h"
+#include "signal.h"
+#include "filter_coeff.h"
+#include "processing.h"
+Int16 rezultat1[SIGNAL1_LENGTH];
+/*
+ *
+ *  main( )
+ *
+ */
+void main( void )
+{
+
+	printf("\n Vezba 1 - Interpolacija i decimacija \n");
+	
+	/* Your code here */
+	downsample(signal1, rezultat1, 1024, 4);
+
+	printf( "\n***Program has Terminated***\n" );
+	SW_BREAKPOINT;
+}
+
