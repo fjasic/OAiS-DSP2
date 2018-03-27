@@ -33,20 +33,18 @@ Int16 sampleBufferL[AUDIO_IO_SIZE];
 #pragma DATA_ALIGN(sampleBufferR,4)
 Int16 sampleBufferR[AUDIO_IO_SIZE];
 
-#define ALPHA 0.3
-#define BETA 0
-Int16 z_yP1[3];
-Int16 z_xP1[3];
-Int16 z_yP2[3];
-Int16 z_xP2[3];
+Int16 z_yPEEK1[3];
+Int16 z_xPEEK1[3];
+Int16 z_yPEEK2[3];
+Int16 z_xPEEK2[3];
 Int16 z_xL[2];
 Int16 z_yL[2];
 Int16 z_xH[2];
 Int16 z_yH[2];
-Int16 out[128];
-short inputShelvingLP[128];
-Int16 shelvingCoeff[4];
-Int16 peekingCoeff[6];
+Int16 shelvingCoeffLP[4];
+Int16 shelvingCoeffHP[4];
+Int16 peekingCoeff1[6];
+Int16 peekingCoeff2[6];
 void main( void )
 {
 	/* Inicijalizaija razvojne ploce */
@@ -74,41 +72,48 @@ void main( void )
     /* Postavljanje vrednosti frekvencije odabiranja i pojacanja na kodeku */
     set_sampling_frequency_and_gain(SAMPLE_RATE, 0);
 
+	int i;
+	for(i = 0; i < 2; i++) {
+		z_xL[i] = 0;
+		z_yL[i] = 0;
+		z_xH[i] = 0;
+		z_yH[i] = 0;
+	}
+
+	for(i = 0; i < 3; i++) {
+			z_xPEEK1[i] = 0;
+			z_yPEEK1[i] = 0;
+			z_xPEEK2[i] = 0;
+			z_yPEEK2[i] = 0;
+	}
+
+	calculateShelvingCoeff(0.98384, shelvingCoeffLP);
+	calculateShelvingCoeff(0.7583, shelvingCoeffHP);
+	calculatePeekCoeff(0.9004,-0.9912,peekingCoeff1);
+	calculatePeekCoeff(0.0664,0.1546,peekingCoeff2);
+
     while(1)
     {
     	aic3204_read_block(sampleBufferL, sampleBufferR);
 
     	/* Your code here */
-    	  	int i;
-    		for(i = 0; i < 2; i++) {
-    			z_xL[i] = 0;
-    			z_yL[i] = 0;
-    			z_xH[i] = 0;
-    			z_yH[i] = 0;
-    		}
 
-    		for(i = 0; i < 3; i++) {
-    				z_xP1[i] = 0;
-    				z_yP1[i] = 0;
-    				z_xP2[i] = 0;
-    				z_yP2[i] = 0;
-    		}
-
-    		calculateShelvingCoeff(ALPHA, shelvingCoeff);
-    		calculatePeekCoeff(ALPHA,BETA,peekingCoeff);
+    		sampleBufferR[0]=10000;
+			for(i=1;i<AUDIO_IO_SIZE;i++)
+			{
+				sampleBufferR[i]=0;
+			}
 
     		// koristim EQ
     		for(i = 0; i < AUDIO_IO_SIZE; i++) {
-    			sampleBufferR[i] = shelvingLP(sampleBufferL[i], shelvingCoeff, z_xL, z_yL, 24576);
-    		}
-    	    /**	// koristim EQ
-			for(i = 0; i < AUDIO_IO_SIZE; i++) {
-				sampleBufferR[i] = shelvingHP(sampleBufferL[i], shelvingCoeff, z_xL, z_yL, 24576);
+    		//  sampleBufferR[i] = shelvingLP(sampleBufferR[i], shelvingCoeffLP, z_xL, z_yL, 24576);
+
+			// sampleBufferR[i] = shelvingHP(sampleBufferR[i], shelvingCoeffHP, z_xH, z_yH, 8192);
+
+			//	sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff1, z_xPEEK1, z_yPEEK1, 8192);
+
+				sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff2, z_xPEEK2, z_yPEEK2, 8192);
 			}
-			// koristim EQ
-			for(i = 0; i < AUDIO_IO_SIZE; i++) {
-				sampleBufferR[i] = shelvingPeek(sampleBufferL[i], peekingCoeff, z_xL, z_yL, 24576);
-			}**/
 
 		aic3204_write_block(sampleBufferR, sampleBufferR);
 	}

@@ -70,41 +70,48 @@ void main( void )
     /* Postavljanje vrednosti frekvencije odabiranja i pojacanja na kodeku */
     set_sampling_frequency_and_gain(SAMPLE_RATE, 0);
 
-    while(1)
-    {
-    	aic3204_read_block(sampleBufferL, sampleBufferR);
+    int i;
+    	for(i = 0; i < 2; i++) {
+    		z_xL[i] = 0;
+    		z_yL[i] = 0;
+    		z_xH[i] = 0;
+    		z_yH[i] = 0;
+    	}
 
-    	/* Your code here */
-    	int i;
-    	    		for(i = 0; i < 2; i++) {
-    	    			z_xL[i] = 0;
-    	    			z_yL[i] = 0;
-    	    			z_xH[i] = 0;
-    	    			z_yH[i] = 0;
-    	    		}
+    	for(i = 0; i < 3; i++) {
+    			z_xPEEK1[i] = 0;
+    			z_yPEEK1[i] = 0;
+    			z_xPEEK2[i] = 0;
+    			z_yPEEK2[i] = 0;
+    	}
 
-    	    		for(i = 0; i < 3; i++) {
-    	    				z_xP1[i] = 0;
-    	    				z_yP1[i] = 0;
-    	    				z_xP2[i] = 0;
-    	    				z_yP2[i] = 0;
-    	    		}
+    	calculateShelvingCoeff(0.3, shelvingCoeffLP);
+    	calculateShelvingCoeff(-0.3, shelvingCoeffHP);
+    	calculatePeekCoeff(0.7,0,peekingCoeff1);
+    	calculatePeekCoeff(0.7,0,peekingCoeff2);
 
-    	    		calculateShelvingCoeff(ALPHA, shelvingCoeff);
-    	    		calculatePeekCoeff(ALPHA,BETA,peekingCoeff);
+        while(1)
+        {
+        	aic3204_read_block(sampleBufferL, sampleBufferR);
 
-    	    		// koristim EQ
-    	    		for(i = 0; i < AUDIO_IO_SIZE; i++) {
-    	    			sampleBufferR[i] = shelvingLP(sampleBufferL[i], shelvingCoeff, z_xL, z_yL, 24576);
-    	    		}
-    	    	    /**	// koristim EQ
-    				for(i = 0; i < AUDIO_IO_SIZE; i++) {
-    					sampleBufferR[i] = shelvingHP(sampleBufferL[i], shelvingCoeff, z_xL, z_yL, 24576);
-    				}
-    				// koristim EQ
-    				for(i = 0; i < AUDIO_IO_SIZE; i++) {
-    					sampleBufferR[i] = shelvingPeek(sampleBufferL[i], peekingCoeff, z_xL, z_yL, 24576);
-    				}**/
+        	/* Your code here */
+
+        		sampleBufferR[0]=10000;
+    			for(i=1;i<AUDIO_IO_SIZE;i++)
+    			{
+    				sampleBufferR[i]=0;
+    			}
+
+        		// koristim EQ
+        		for(i = 0; i < AUDIO_IO_SIZE; i++) {
+        		//  sampleBufferR[i] = shelvingLP(sampleBufferR[i], shelvingCoeffLP, z_xL, z_yL, 24576);
+
+    			// sampleBufferR[i] = shelvingHP(sampleBufferR[i], shelvingCoeffHP, z_xH, z_yH, 8192);
+
+    				sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff1, z_xPEEK1, z_yPEEK1, 24576);
+
+    			//	sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff2, z_xPEEK2, z_yPEEK2, 24576);
+    			}
 
 
 
