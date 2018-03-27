@@ -4,10 +4,7 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccs6/ccsv6/tools/compiler/c5500_4.4.1
-
-GEN_OPTS__FLAG := 
-GEN_CMDS__FLAG := 
+CG_TOOL_ROOT := C:/ti/ccsv6/tools/compiler/c5500_4.4.1
 
 ORDERED_OBJS += \
 "./aic3204.obj" \
@@ -18,13 +15,13 @@ ORDERED_OBJS += \
 "./print_number.obj" \
 "./processing.obj" \
 "../lnkx.cmd" \
-"../c55xx_csl/lib/cslVC5505.lib" \
 "../lib/ezdsp5535bsl.lib" \
+"../c55xx_csl/lib/cslVC5505.lib" \
 $(GEN_CMDS__FLAG) \
--lrts55x.lib \
--lezdsp5535bsl.lib \
--lcslVC5505.lib \
--llibc.a \
+-l"rts55x.lib" \
+-l"ezdsp5535bsl.lib" \
+-l"cslVC5505.lib" \
+-l"libc.a" \
 
 -include ../makefile.init
 
@@ -34,11 +31,11 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
--include c55xx_csl/lib/subdir_vars.mk
 -include lib/subdir_vars.mk
+-include c55xx_csl/lib/subdir_vars.mk
 -include subdir_rules.mk
--include c55xx_csl/lib/subdir_rules.mk
 -include lib/subdir_rules.mk
+-include c55xx_csl/lib/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -59,9 +56,6 @@ ifneq ($(strip $(ASM_DEPS)),)
 endif
 ifneq ($(strip $(CC_DEPS)),)
 -include $(CC_DEPS)
-endif
-ifneq ($(strip $(SV7A_DEPS)),)
--include $(SV7A_DEPS)
 endif
 ifneq ($(strip $(S55_DEPS)),)
 -include $(S55_DEPS)
@@ -154,20 +148,20 @@ all: EQ.out
 EQ.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: C5500 Linker'
-	"C:/ti/ccs6/ccsv6/tools/compiler/c5500_4.4.1/bin/cl55" -v5515 --memory_model=large -g --define=c5535 --diag_warning=225 --ptrdiff_size=16 -z -m"EQ.map" --stack_size=0x200 --heap_size=0x400 -i"C:/ti/ccs6/ccsv6/tools/compiler/c5500_4.4.1/lib" -i"C:/ti/ccs6/ccsv6/tools/compiler/c5500_4.4.1/include" -i"C:/Users/NN/Desktop/OAIS DPS2/OAiS-DSP2/EQ-Projekat/EQ/c55xx_csl/lib" -i"C:/Users/NN/Desktop/OAIS DPS2/OAiS-DSP2/EQ-Projekat/EQ/lib" --reread_libs --warn_sections --xml_link_info="vezba-ezdsp_linkInfo.xml" --rom_model --sys_stacksize=0x200 -o "EQ.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/c5500_4.4.1/bin/cl55" -v5515 --memory_model=large -g --define=c5535 --diag_warning=225 --ptrdiff_size=16 -z -m"EQ.map" --stack_size=0x200 --heap_size=0x400 -i"C:/ti/ccsv6/tools/compiler/c5500_4.4.1/lib" -i"C:/ti/ccsv6/tools/compiler/c5500_4.4.1/include" -i"C:/Users/student/Desktop/dsp2-ra46-2014/OAiS-DSP2/EQ-Projekat/EQ/c55xx_csl/lib" -i"C:/Users/student/Desktop/dsp2-ra46-2014/OAiS-DSP2/EQ-Projekat/EQ/lib" --reread_libs --warn_sections --xml_link_info="vezba-ezdsp_linkInfo.xml" --rom_model --sys_stacksize=0x200 -o "EQ.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 EQ.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: C5500 Hex Utility'
-	"C:/ti/ccs6/ccsv6/tools/compiler/c5500_4.4.1/bin/hex55"  -o "EQ.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv6/tools/compiler/c5500_4.4.1/bin/hex55"  -o "EQ.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "aic3204.d" "aic3204_init.d" "ezdsp5535_aic3204_dma.d" "iir.d" "main.d" "print_number.d" "processing.d" 
+	-$(RM) "aic3204.pp" "aic3204_init.pp" "ezdsp5535_aic3204_dma.pp" "iir.pp" "main.pp" "print_number.pp" "processing.pp" 
 	-$(RM) "aic3204.obj" "aic3204_init.obj" "ezdsp5535_aic3204_dma.obj" "iir.obj" "main.obj" "print_number.obj" "processing.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '

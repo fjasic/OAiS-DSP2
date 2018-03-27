@@ -33,19 +33,18 @@ Int16 sampleBufferL[AUDIO_IO_SIZE];
 #pragma DATA_ALIGN(sampleBufferR,4)
 Int16 sampleBufferR[AUDIO_IO_SIZE];
 
-#define ALPHA 0.3
-#define BETA 0
-Int16 z_yP1[3];
-Int16 z_xP1[3];
-Int16 z_yP2[3];
-Int16 z_xP2[3];
+Int16 z_yPEEK1[3];
+Int16 z_xPEEK1[3];
+Int16 z_yPEEK2[3];
+Int16 z_xPEEK2[3];
 Int16 z_xL[2];
 Int16 z_yL[2];
 Int16 z_xH[2];
 Int16 z_yH[2];
-
-Int16 shelvingCoeff[4];
-Int16 peekingCoeff[6];
+Int16 shelvingCoeffLP[4];
+Int16 shelvingCoeffHP[4];
+Int16 peekingCoeff1[6];
+Int16 peekingCoeff2[6];
 void main( void )
 {   
     /* Inicijalizaija razvojne ploce */
@@ -85,10 +84,10 @@ void main( void )
     			z_yPEEK2[i] = 0;
     	}
 
-    	calculateShelvingCoeff(0.3, shelvingCoeffLP);
-    	calculateShelvingCoeff(-0.3, shelvingCoeffHP);
-    	calculatePeekCoeff(0.7,0,peekingCoeff1);
-    	calculatePeekCoeff(0.7,0,peekingCoeff2);
+    	calculateShelvingCoeff(-0.3322, shelvingCoeffLP);
+    	calculateShelvingCoeff(0.0777, shelvingCoeffHP);
+    	calculatePeekCoeff(1,-0.4337,peekingCoeff1);
+    	calculatePeekCoeff(-0.87559,0.0332,peekingCoeff2);
 
         while(1)
         {
@@ -104,14 +103,14 @@ void main( void )
 
         		// koristim EQ
         		for(i = 0; i < AUDIO_IO_SIZE; i++) {
-        		//  sampleBufferR[i] = shelvingLP(sampleBufferR[i], shelvingCoeffLP, z_xL, z_yL, 24576);
+        		sampleBufferR[i] = shelvingLP(sampleBufferR[i], shelvingCoeffLP, z_xL, z_yL, 24576);
 
-    			// sampleBufferR[i] = shelvingHP(sampleBufferR[i], shelvingCoeffHP, z_xH, z_yH, 8192);
+    			sampleBufferR[i] = shelvingHP(sampleBufferR[i], shelvingCoeffHP, z_xH, z_yH, 24576);
 
-    				sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff1, z_xPEEK1, z_yPEEK1, 24576);
+    			sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff1, z_xPEEK1, z_yPEEK1, 24576);
 
-    			//	sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff2, z_xPEEK2, z_yPEEK2, 24576);
-    			}
+    			sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff2, z_xPEEK2, z_yPEEK2, 24576);
+        		}
 
 
 

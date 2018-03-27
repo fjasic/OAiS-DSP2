@@ -61,9 +61,6 @@ void main( void )
     /* Inicijalizacija veze sa AIC3204 kodekom (AD/DA) */
     aic3204_hardware_init();
 
-	aic3204_set_input_filename("../input1.pcm");
-    aic3204_set_output_filename("../output1.pcm");
-
     /* Inicijalizacija AIC3204 kodeka */
 	aic3204_init();
 	
@@ -86,11 +83,10 @@ void main( void )
 			z_xPEEK2[i] = 0;
 			z_yPEEK2[i] = 0;
 	}
-
-	calculateShelvingCoeff(0.98384, shelvingCoeffLP);
-	calculateShelvingCoeff(0.7583, shelvingCoeffHP);
-	calculatePeekCoeff(0.9004,-0.9912,peekingCoeff1);
-	calculatePeekCoeff(0.0664,0.1546,peekingCoeff2);
+	calculateShelvingCoeff(-0.3322, shelvingCoeffLP);
+	calculateShelvingCoeff(0.0777, shelvingCoeffHP);
+	calculatePeekCoeff(1,-0.4337,peekingCoeff1);
+	calculatePeekCoeff(-0.87559,0.0332,peekingCoeff2);
 
     while(1)
     {
@@ -105,14 +101,14 @@ void main( void )
 			}
 
     		// koristim EQ
-    		for(i = 0; i < AUDIO_IO_SIZE; i++) {
-    		//  sampleBufferR[i] = shelvingLP(sampleBufferR[i], shelvingCoeffLP, z_xL, z_yL, 24576);
+    	for(i = 0; i < AUDIO_IO_SIZE; i++) {
+			sampleBufferR[i] = shelvingLP(sampleBufferR[i], shelvingCoeffLP, z_xL, z_yL, 24576);
 
-			// sampleBufferR[i] = shelvingHP(sampleBufferR[i], shelvingCoeffHP, z_xH, z_yH, 8192);
+			sampleBufferR[i] = shelvingHP(sampleBufferR[i], shelvingCoeffHP, z_xH, z_yH, 24576);
 
-			//	sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff1, z_xPEEK1, z_yPEEK1, 8192);
+			sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff1, z_xPEEK1, z_yPEEK1, 24576);
 
-				sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff2, z_xPEEK2, z_yPEEK2, 8192);
+			sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff2, z_xPEEK2, z_yPEEK2, 24576);
 			}
 
 		aic3204_write_block(sampleBufferR, sampleBufferR);
