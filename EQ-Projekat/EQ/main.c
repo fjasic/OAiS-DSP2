@@ -45,6 +45,13 @@ Int16 shelvingCoeffLP[4];
 Int16 shelvingCoeffHP[4];
 Int16 peekingCoeff1[6];
 Int16 peekingCoeff2[6];
+Uint16 sw1current;
+Uint16 sw2current;
+Uint16 sw1previous;
+Uint16 sw2previous;
+Int16 k;
+Uint16 key;
+Int16 menjam;
 void main( void )
 {   
     /* Inicijalizaija razvojne ploce */
@@ -69,7 +76,7 @@ void main( void )
     /* Postavljanje vrednosti frekvencije odabiranja i pojacanja na kodeku */
     set_sampling_frequency_and_gain(SAMPLE_RATE, 0);
 
-    int i;
+    	int i;
     	for(i = 0; i < 2; i++) {
     		z_xL[i] = 0;
     		z_yL[i] = 0;
@@ -83,38 +90,87 @@ void main( void )
     			z_xPEEK2[i] = 0;
     			z_yPEEK2[i] = 0;
     	}
-
-    	calculateShelvingCoeff(-0.3322, shelvingCoeffLP);
-    	calculateShelvingCoeff(0.0777, shelvingCoeffHP);
+    	/*-0.3322
+    	 * 0.0777
+    	 * 1,-0.4337
+    	 * -0.87559,0.0332
+    	 *
+    	 * alternativni koeficijenti
+    	 * 0.07065
+    	 * 1.9625
+    	 * 0.278675,0.176625
+    	 * 1.26385,0.482775
+    	 *
+    	 */
+    	calculateShelvingCoeff(0.07065, shelvingCoeffLP);
+    	calculateShelvingCoeff(0.3, shelvingCoeffHP);
     	calculatePeekCoeff(1,-0.4337,peekingCoeff1);
     	calculatePeekCoeff(-0.87559,0.0332,peekingCoeff2);
+    	sw1previous = sw1current;
+    	sw2previous = sw2current;
+    	k=32767;
+    	menjam=0;
 
         while(1)
         {
+
+        	sw1current = EZDSP5535_SAR_getKey();
+			key = EZDSP5535_SAR_getKey();
+									switch(key)
+									{
+										case SW1:
+											clearLCD();
+
+
+										  break;
+
+										case SW2:
+											printChar('2');
+											k-=3277;
+											if(k<0){
+												k=32767;
+											}
+											clearLCD();
+										  break;
+
+										case SW12:
+
+										  break;
+
+										case NoKey:
+
+											break;
+									}
         	aic3204_read_block(sampleBufferL, sampleBufferR);
 
         	/* Your code here */
+        	printf("%d",k);
+        	printf("\n");
+			sampleBufferR[0]=10000;
+			for(i=1;i<AUDIO_IO_SIZE;i++)
+			{
+				sampleBufferR[i]=0;
+			}
 
-        		sampleBufferR[0]=10000;
-    			for(i=1;i<AUDIO_IO_SIZE;i++)
-    			{
-    				sampleBufferR[i]=0;
-    			}
-
-        		// koristim EQ
-        		for(i = 0; i < AUDIO_IO_SIZE; i++) {
-        		sampleBufferR[i] = shelvingLP(sampleBufferR[i], shelvingCoeffLP, z_xL, z_yL, 24576);
-
-    			sampleBufferR[i] = shelvingHP(sampleBufferR[i], shelvingCoeffHP, z_xH, z_yH, 24576);
-
-    			sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff1, z_xPEEK1, z_yPEEK1, 24576);
-
-    			sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff2, z_xPEEK2, z_yPEEK2, 24576);
-        		}
-
+			// koristim EQ
+			/*for(i = 0; i < AUDIO_IO_SIZE; i++) {
+			sampleBufferR[i] = shelvingLP(sampleBufferR[i], shelvingCoeffLP, z_xL, z_yL, k);
+			}
+			for(i = 0; i < AUDIO_IO_SIZE; i++) {
+			sampleBufferR[i] = shelvingHP(sampleBufferR[i], shelvingCoeffHP, z_xH, z_yH, k);
+			}*/
+			for(i = 0; i < AUDIO_IO_SIZE; i++) {
+			sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff1, z_xPEEK1, z_yPEEK1, k);
+			}/*
+			for(i = 0; i < AUDIO_IO_SIZE; i++) {
+			sampleBufferR[i] = shelvingPeek(sampleBufferR[i], peekingCoeff2, z_xPEEK2, z_yPEEK2, k);
+			}*/
 
 
 		aic3204_write_block(sampleBufferR, sampleBufferR);
+		sw1previous = sw1current;
+		sw2previous = sw2current;
+
 	}
 
     	
